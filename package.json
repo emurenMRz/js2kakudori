@@ -1,0 +1,21 @@
+{
+  "name": "js2kakudori",
+  "version": "1.0.0",
+  "description": "2kakudori for web browser",
+  "private": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "webpack": "webpack"
+  },
+  "keywords": [
+    "javascript",
+    "browsergame"
+  ],
+  "author": "emurenMRz",
+  "license": "UNLICENSED",
+  "dependencies": {},
+  "devDependencies": {
+    "webpack": "^5.12.3",
+    "webpack-cli": "^4.3.1"
+  }
+}

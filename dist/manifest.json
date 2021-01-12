@@ -1,0 +1,20 @@
+{
+	"name": "js2kakudori",
+	"short_name": "js2kakudori",
+	"background_color": "#028c4f",
+	"icons": [
+		{
+			"src": "/js2kakudori/icon-256.png",
+			"sizes": "256x256",
+			"type": "image/png"
+		},
+		{
+			"src": "/js2kakudori/icon-192.png",
+			"sizes": "192x192",
+			"type": "image/png"
+		}
+	],
+	"start_url": "/js2kakudori/?utm_source=homescreen",
+	"scope": "/js2kakudori/",
+	"display": "standalone"
+}

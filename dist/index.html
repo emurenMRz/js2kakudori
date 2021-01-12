@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="ja">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>js2kakudori</title>
+	<meta name="description" content="水平・垂直の直線3本以内で結ぶことができる同じ牌のペアを場から消去していくゲームです。PWA対応">
+	<meta property="og:title" content="js2kakudori">
+	<meta property="og:type" content="website">
+	<meta property="og:image" content="https://app.mrz-net.org/js2kakudori/ogp.jpg">
+	<meta property="og:url" content="https://app.mrz-net.org/js2kakudori/">
+	<meta property="og:description" content="水平・垂直の直線3本以内で結ぶことができる同じ牌のペアを場から消去していくゲームです。PWA対応">
+	<meta name="twitter:card" content="summary_large_image">
+	<meta name="twitter:site" content="@emurenMRz">
+	
+	<link rel="icon" href="favicon.ico">
+	<link rel="manifest" href="manifest.json">
+	<link href="2kakudori.css" rel="stylesheet">
+	<script src="main.js" type="module"></script>
+	<script>
+		if ('serviceWorker' in navigator)
+			navigator.serviceWorker.register('service_worker.js')
+				.then(registration => registration.onupdatefound = () => registration.update());
+	</script>
+</head>
+
+<body>
+	<div id="base">
+		<div id="basic-layout">
+			<div id="status">
+				<div id="control-box">
+					<div id="reset"></div>
+					<div id="hint"></div>
+					<div id="shuffle"></div>
+				</div>
+				<div id="basket"></div>
+			</div>
+			<div id="mat"><canvas id="connect"></canvas></div>
+		</div>
+		<div id="score"></div>
+		<div id="message"></div>
+	</div>
+</body>
+
+</html>
