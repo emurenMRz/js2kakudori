@@ -7,6 +7,9 @@ export class ScoreBoard {
 		this.update();
 	}
 
+	toJSON() { return { score: this.score }; }
+	restore(data) { this.score = data.score; this.update(); }
+
 	init() { this.score = 0; this.update(); }
 	add(v) { this.score += v; this.update(); }
 

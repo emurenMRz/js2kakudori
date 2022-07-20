@@ -16,25 +16,31 @@ export class Grid {
 		this.grid = grid;
 	}
 
+	toJSON() { return { grid: this.grid }; }
+
 	isEmpty(x, y) { return this.grid[y][x] == EMPTY; }
 	setEmpty(x, y) { return this.grid[y][x] = EMPTY; }
 	getTileId(x, y) { return this.grid[y + 2][x + 2]; }
 
-	init() {
-		for (let y = 1; y < GRID_MAX_Y + 3; ++y)
-			for (let x = 1; x < GRID_MAX_X + 3; ++x)
-				this.grid[y][x] = EMPTY;
+	init(restoreData = undefined) {
+		if (restoreData)
+			this.grid = restoreData.grid;
+		else {
+			for (let y = 1; y < GRID_MAX_Y + 3; ++y)
+				for (let x = 1; x < GRID_MAX_X + 3; ++x)
+					this.grid[y][x] = EMPTY;
 
-		for (let q = 0; q < 4; ++q)
-			for (let tileType = 0; tileType < TILE_TYPE_MAX; ++tileType) {
-				let x, y;
-				do {
-					x = (Math.random() * GRID_MAX_X + 2) | 0;
-					y = (Math.random() * GRID_MAX_Y + 2) | 0;
+			for (let q = 0; q < 4; ++q)
+				for (let tileType = 0; tileType < TILE_TYPE_MAX; ++tileType) {
+					let x, y;
+					do {
+						x = (Math.random() * GRID_MAX_X + 2) | 0;
+						y = (Math.random() * GRID_MAX_Y + 2) | 0;
+					}
+					while (this.grid[y][x] != -1);
+					this.grid[y][x] = tileType;
 				}
-				while (this.grid[y][x] != -1);
-				this.grid[y][x] = tileType;
-			}
+		}
 	}
 
 	findSimilarTiles(x, y) {

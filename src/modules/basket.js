@@ -9,8 +9,13 @@ export class Basket {
 		this.ballHeight = BALL_H;
 	}
 
-	init(ratio) {
-		this.restOfBalls = INITIAL_NUMBER_OF_BALLS;
+	toJSON() { return { restOfBalls: this.restOfBalls }; }
+
+	init(ratio, restoreData = undefined) {
+		if (restoreData)
+			this.restOfBalls = restoreData.restOfBalls;
+		else
+			this.restOfBalls = INITIAL_NUMBER_OF_BALLS;
 		if (ratio !== undefined) {
 			this.ballWidth = BALL_W * ratio;
 			this.ballHeight = BALL_H * ratio;

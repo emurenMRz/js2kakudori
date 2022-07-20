@@ -245,9 +245,9 @@ import { Basket } from './modules/basket.js';
 		setTimeout(() => deleteTile(s, d, FLOAT_HEIGHT), 16);
 	}
 
-	function resetGame() {
+	function resetGame(restoreData = undefined) {
 		selectedTile.clear();
-		grid.init();
+		grid.init(restoreData?.grid);
 		for (let y = 0; y < GRID_MAX_Y; ++y)
 			for (let x = 0; x < GRID_MAX_X; ++x) {
 				const child = getGridElement(x, y);
@@ -262,7 +262,7 @@ import { Basket } from './modules/basket.js';
 		basket.add(bonusScore);
 		updateButtonState();
 		bonusScore = 0;
-		gamePhase = GamePhase.MAIN;
+		gamePhase = restoreData?.gamePhase !== undefined ? restoreData.gamePhase : GamePhase.MAIN;
 	}
 
 	function shuffleBoard() {
@@ -340,6 +340,21 @@ import { Basket } from './modules/basket.js';
 	}
 
 	addEventListener('load', () => {
+		const restoreData = {
+			gamePhase: GamePhase.MAIN,
+			bonusScore: 0,
+			grid: undefined,
+			scoreBoard: 0,
+			basket: 0,
+		};
+		const gameData = localStorage.getItem('gameData');
+		if (gameData) {
+			Object.assign(restoreData, JSON.parse(gameData));
+			localStorage.clear();
+		}
+		bonusScore = restoreData.bonusScore;
+		scoreBoard.restore(restoreData.scoreBoard);
+
 		const base = document.getElementById('base');
 		const buttonRatio = calcClientRatio(base.clientWidth, base.clientHeight);
 
@@ -349,7 +364,7 @@ import { Basket } from './modules/basket.js';
 		buttons.push(new Button('reset', buttonRatio, 0, doReset));
 		buttons.push(new Button('hint', buttonRatio, HINT_COST, doHint));
 		buttons.push(new Button('shuffle', buttonRatio, SHUFFLE_COST, doShuffle));
-		basket.init(buttonRatio);
+		basket.init(buttonRatio, restoreData.basket);
 		gameOver.resize(buttonRatio);
 
 		const mat = document.getElementById('mat');
@@ -400,7 +415,9 @@ import { Basket } from './modules/basket.js';
 				mat.insertBefore(child, connect);
 			}
 
-		resetGame();
+		resetGame(restoreData);
+		if (gamePhase == GamePhase.GAMEOVER)
+			gameOver.init();
 	});
 
 	addEventListener('resize', () => {
@@ -437,5 +454,9 @@ import { Basket } from './modules/basket.js';
 			console.log('[chart] auto take.');
 			pickUp(search());
 		}
+	});
+
+	addEventListener('unload', () => {
+		localStorage.setItem('gameData', JSON.stringify({ gamePhase, bonusScore, grid, scoreBoard, basket }));
 	});
 })();
