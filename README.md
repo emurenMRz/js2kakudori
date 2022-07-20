@@ -3,4 +3,4 @@ The game is to eliminate all pairs of the same tile from the field. Tiles that c
 
 ## GAME PLAY
 
-https://app.mrz-net.org/js2kakudori/
+https://js2kakudori.mrz-net.org/
