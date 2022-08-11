@@ -340,18 +340,20 @@ import { Basket } from './modules/basket.js';
 	}
 
 	addEventListener('load', () => {
-		const restoreData = {
-			gamePhase: GamePhase.MAIN,
-			bonusScore: 0,
-			grid: undefined,
-			scoreBoard: 0,
-			basket: 0,
+		const restoreValue = (key, defaultValue) => {
+			const v = localStorage.getItem(key);
+			return v !== null ? JSON.parse(v) : defaultValue;
 		};
-		const gameData = localStorage.getItem('gameData');
-		if (gameData) {
-			Object.assign(restoreData, JSON.parse(gameData));
-			localStorage.clear();
-		}
+
+		const restoreData = {
+			gamePhase: restoreValue('gamePhase', GamePhase.MAIN),
+			bonusScore: restoreValue('bonusScore', 0),
+			grid: restoreValue('grid', undefined),
+			scoreBoard: restoreValue('scoreBoard', scoreBoard.initValue),
+			basket: restoreValue('basket', basket.initValue),
+		};
+		localStorage.clear();
+
 		bonusScore = restoreData.bonusScore;
 		scoreBoard.restore(restoreData.scoreBoard);
 
@@ -457,6 +459,10 @@ import { Basket } from './modules/basket.js';
 	});
 
 	addEventListener('unload', () => {
-		localStorage.setItem('gameData', JSON.stringify({ gamePhase, bonusScore, grid, scoreBoard, basket }));
+		localStorage.setItem('gamePhase', JSON.stringify(gamePhase));
+		localStorage.setItem('bonusScore', JSON.stringify(bonusScore));
+		localStorage.setItem('grid', JSON.stringify(grid));
+		localStorage.setItem('scoreBoard', JSON.stringify(scoreBoard));
+		localStorage.setItem('basket', JSON.stringify(basket));
 	});
 })();

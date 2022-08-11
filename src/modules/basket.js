@@ -11,6 +11,8 @@ export class Basket {
 
 	toJSON() { return { restOfBalls: this.restOfBalls }; }
 
+	get initValue() { return { restOfBalls: INITIAL_NUMBER_OF_BALLS }; }
+
 	init(ratio, restoreData = undefined) {
 		if (restoreData)
 			this.restOfBalls = restoreData.restOfBalls;
