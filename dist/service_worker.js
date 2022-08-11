@@ -1,4 +1,4 @@
-var cacheName = 'js2kakudori-v1.20220811_3';
+var cacheName = 'js2kakudori-v1.20220811_swap';
 var appFiles = [
 	'/',
 	'/index.html',
@@ -14,6 +14,7 @@ var appFiles = [
 	'/images/redball.png',
 	'/images/reset.png',
 	'/images/shuffle.png',
+	'/images/swap.png',
 	'/images/tile/j1.png',
 	'/images/tile/j2.png',
 	'/images/tile/j3.png',

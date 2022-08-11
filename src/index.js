@@ -1,6 +1,6 @@
 import { Grid, GRID_MAX_X, GRID_MAX_Y } from './modules/grid.js';
 import { ConnectLine } from './modules/connect_line.js';
-import { Button } from './modules/button.js';
+import { Button, SwapButton } from './modules/button.js';
 import { GameOver } from './modules/gameover.js';
 import { ScoreBoard } from './modules/score_board.js';
 import { Basket } from './modules/basket.js';
@@ -21,6 +21,7 @@ import { Basket } from './modules/basket.js';
 	const GamePhase = { INIT: 0, MAIN: 1, GAMEOVER: 2, GAMECLEAR: 3, AUTO: 4 };
 	let gamePhase = GamePhase.INIT;
 	let bonusScore = 0;
+	let layout = 'L-status';
 	let inPickUp = false;
 
 	const grid = new Grid();
@@ -339,6 +340,17 @@ import { Basket } from './modules/basket.js';
 		gamePhase = GamePhase.MAIN;
 	}
 
+	function doSwapLayout() {
+		const basicLayout = document.getElementById('basic-layout');
+		if (basicLayout.classList.contains('L-status')) {
+			basicLayout.classList.replace('L-status', 'R-status');
+			layout = 'R-status';
+		} else {
+			basicLayout.classList.replace('R-status', 'L-status');
+			layout = 'L-status';
+		}
+	}
+
 	addEventListener('load', () => {
 		const restoreValue = (key, defaultValue) => {
 			const v = localStorage.getItem(key);
@@ -351,10 +363,12 @@ import { Basket } from './modules/basket.js';
 			grid: restoreValue('grid', undefined),
 			scoreBoard: restoreValue('scoreBoard', scoreBoard.initValue),
 			basket: restoreValue('basket', basket.initValue),
+			layout: restoreValue('layout', 'L-status'),
 		};
 		localStorage.clear();
 
 		bonusScore = restoreData.bonusScore;
+		layout = restoreData.layout;
 		scoreBoard.restore(restoreData.scoreBoard);
 
 		const base = document.getElementById('base');
@@ -366,8 +380,12 @@ import { Basket } from './modules/basket.js';
 		buttons.push(new Button('reset', buttonRatio, 0, doReset));
 		buttons.push(new Button('hint', buttonRatio, HINT_COST, doHint));
 		buttons.push(new Button('shuffle', buttonRatio, SHUFFLE_COST, doShuffle));
+		buttons.push(new SwapButton('swap', buttonRatio, doSwapLayout));
 		basket.init(buttonRatio, restoreData.basket);
 		gameOver.resize(buttonRatio);
+
+		const basicLayout = document.getElementById('basic-layout');
+		basicLayout.classList.add(layout);
 
 		const mat = document.getElementById('mat');
 		const cw = mat.clientWidth;
@@ -464,5 +482,6 @@ import { Basket } from './modules/basket.js';
 		localStorage.setItem('grid', JSON.stringify(grid));
 		localStorage.setItem('scoreBoard', JSON.stringify(scoreBoard));
 		localStorage.setItem('basket', JSON.stringify(basket));
+		localStorage.setItem('layout', JSON.stringify(layout));
 	});
 })();

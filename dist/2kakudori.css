@@ -10,6 +10,7 @@ html, body {
 	background-repeat: no-repeat;
 	background-size: contain;
 	z-index: 1000;
+	cursor: pointer;
 	transition: filter .3s ease;
 }
 .hint {filter: invert(1);}
@@ -21,8 +22,12 @@ html, body {
 	background-size: cover;
 	box-shadow: 2px 2px 4px black;
 	z-index: 3000;
+	cursor: pointer;
+	transition: all .3s ease;
 }
 .button:hover {filter: brightness(1.5);}
+.L-status .button {box-shadow: 2px 2px 4px black;}
+.R-status .button {box-shadow: -2px 2px 4px black;}
 .disable {
 	filter: grayscale(1);
 	opacity: .75;
@@ -67,15 +72,16 @@ html, body {
 	background-size: cover;
 }
 
-#basic-layout{
+#basic-layout {
 	display: flex;
-	flex-direction: row;
 	position: relative;
 	margin: 0;
 	padding: 0;
 	width: 100%;
 	height: 100%;
 }
+.L-status {flex-direction: row;}
+.R-status {flex-direction: row-reverse;}
 
 #status {
 	display: flex;
@@ -103,6 +109,18 @@ html, body {
 	overflow: hidden;
 	line-height: 0;
 }
+
+#swap {
+	margin-top: auto;
+    margin-bottom: 2em;
+	background-image: url('images/swap.png');
+	background-repeat: no-repeat;
+	background-size: contain;
+	z-index: 3000;
+	cursor: pointer;
+	transition: all .3s ease;
+}
+#swap:hover {filter: brightness(2);}
 
 #mat {
 	position: relative;
@@ -155,4 +173,5 @@ html, body {
 	#basic-layout {flex-direction: column;}
 	#control-box {flex-direction: row;}
 	#basket {width: auto; text-align: center;}
+	#swap {display: none;}
 }

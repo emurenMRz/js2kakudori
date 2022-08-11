@@ -23,7 +23,7 @@ export class Grid {
 	getTileId(x, y) { return this.grid[y + 2][x + 2]; }
 
 	init(restoreData = undefined) {
-		if (restoreData)
+		if (restoreData && restoreData.grid !== undefined)
 			this.grid = restoreData.grid;
 		else {
 			for (let y = 1; y < GRID_MAX_Y + 3; ++y)
