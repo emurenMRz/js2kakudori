@@ -4,8 +4,12 @@ import { Button, SwapButton } from './modules/button.js';
 import { GameOver } from './modules/gameover.js';
 import { ScoreBoard } from './modules/score_board.js';
 import { Basket } from './modules/basket.js';
+import Store from './modules/store.js';
 
 (function () {
+	const DBName = "js2kakudori";
+	const DBVersion = 22121601;
+
 	const HINT_COST = 1;
 	const SHUFFLE_COST = 5;
 
@@ -19,9 +23,6 @@ import { Basket } from './modules/basket.js';
 	let cx, cy;
 
 	const GamePhase = { INIT: 0, MAIN: 1, GAMEOVER: 2, GAMECLEAR: 3, AUTO: 4 };
-	let gamePhase = GamePhase.INIT;
-	let bonusScore = 0;
-	let layout = 'L-status';
 	let inPickUp = false;
 
 	const grid = new Grid();
@@ -212,25 +213,31 @@ import { Basket } from './modules/basket.js';
 			numberOfRemaining += map[type].length;
 
 		if (!numberOfRemaining) {
-			gamePhase = GamePhase.GAMECLEAR;
+			Store.update({ gamePhase: GamePhase.GAMECLEAR });
 			resetGame();
 			return;
 		}
+
+		const store = { grid: grid.toJSON() };
 
 		const pairs = listOfCanTakenTiles(map);
 		if (!pairs.canTaken.length) {
 			const find = search();
 			if (find)
 				alert('checkRestOfTile: tile remains.');
-			gamePhase = GamePhase.GAMEOVER;
+			store.gamePhase = GamePhase.GAMEOVER;
 			gameOver.init();
 		}
 		else if (pairs.canAllTaken) {
-			gamePhase = GamePhase.AUTO;
+			let bonusScore = Store.get("bonusScore");
 			++bonusScore;
 			scoreBoard.add(bonusScore);
+			store.gamePhase = GamePhase.AUTO;
+			store.bonusScore = bonusScore;
+			store.scoreBoard = scoreBoard.toJSON();
 			pickUp(pairs.canTaken[0]);
 		}
+		Store.update(store);
 	}
 
 	//=====  =====//
@@ -260,10 +267,15 @@ import { Basket } from './modules/basket.js';
 				child.style.opacity = 1;
 				child.style.backgroundImage = `url("${grid.tileImage(x, y)}")`;
 			}
-		basket.add(bonusScore);
+		basket.add(Store.get("bonusScore"));
 		updateButtonState();
-		bonusScore = 0;
-		gamePhase = restoreData?.gamePhase !== undefined ? restoreData.gamePhase : GamePhase.MAIN;
+		Store.update({
+			gamePhase: restoreData?.gamePhase !== undefined ? restoreData.gamePhase : GamePhase.MAIN,
+			bonusScore: 0,
+			grid: grid.toJSON(),
+			scoreBoard: scoreBoard.toJSON(),
+			basket: basket.toJSON(),
+		});
 	}
 
 	function shuffleBoard() {
@@ -329,6 +341,7 @@ import { Basket } from './modules/basket.js';
 			getGridElement(pair[1].x - 2, pair[1].y - 2).classList.add('hint');
 		}
 		selectedTile.clear();
+		Store.update({ basket: basket.toJSON() });
 	}
 
 	function doShuffle() {
@@ -337,38 +350,33 @@ import { Basket } from './modules/basket.js';
 		updateButtonState();
 		gameOver.clear();
 		shuffleBoard();
-		gamePhase = GamePhase.MAIN;
+		Store.update({
+			gamePhase: GamePhase.MAIN,
+			basket: basket.toJSON()
+		});
 	}
 
 	function doSwapLayout() {
 		const basicLayout = document.getElementById('basic-layout');
 		if (basicLayout.classList.contains('L-status')) {
 			basicLayout.classList.replace('L-status', 'R-status');
-			layout = 'R-status';
+			Store.update({ layout: "R-status" });
 		} else {
 			basicLayout.classList.replace('R-status', 'L-status');
-			layout = 'L-status';
+			Store.update({ layout: "L-status" });
 		}
 	}
 
-	addEventListener('load', () => {
-		const restoreValue = (key, defaultValue) => {
-			const v = localStorage.getItem(key);
-			return v !== null ? JSON.parse(v) : defaultValue;
-		};
+	addEventListener('load', async () => {
+		const restoreData = await Store.connect(DBName, DBVersion, [
+			{ name: "gamePhase", defaultValue: GamePhase.MAIN },
+			{ name: "bonusScore", defaultValue: 0 },
+			{ name: "grid", defaultValue: undefined },
+			{ name: "scoreBoard", defaultValue: scoreBoard.initValue },
+			{ name: "basket", defaultValue: basket.initValue },
+			{ name: "layout", defaultValue: 'L-status' },
+		]);
 
-		const restoreData = {
-			gamePhase: restoreValue('gamePhase', GamePhase.MAIN),
-			bonusScore: restoreValue('bonusScore', 0),
-			grid: restoreValue('grid', undefined),
-			scoreBoard: restoreValue('scoreBoard', scoreBoard.initValue),
-			basket: restoreValue('basket', basket.initValue),
-			layout: restoreValue('layout', 'L-status'),
-		};
-		localStorage.clear();
-
-		bonusScore = restoreData.bonusScore;
-		layout = restoreData.layout;
 		scoreBoard.restore(restoreData.scoreBoard);
 
 		const base = document.getElementById('base');
@@ -385,7 +393,7 @@ import { Basket } from './modules/basket.js';
 		gameOver.resize(buttonRatio);
 
 		const basicLayout = document.getElementById('basic-layout');
-		basicLayout.classList.add(layout);
+		basicLayout.classList.add(restoreData.layout);
 
 		const mat = document.getElementById('mat');
 		const cw = mat.clientWidth;
@@ -394,7 +402,7 @@ import { Basket } from './modules/basket.js';
 		connectLine.init(cw, ch, cx, cy, TILE_W, TILE_H, LINE_WIDTH);
 
 		const clickTile = function () {
-			if (gamePhase != GamePhase.MAIN || this.dataset.tileType == -1)
+			if (Store.get("gamePhase") != GamePhase.MAIN || this.dataset.tileType == -1)
 				return;
 			if (selectedTile.isEmpty)
 				selectedTile.set(this);
@@ -411,6 +419,7 @@ import { Basket } from './modules/basket.js';
 					for (let y = 0; y < GRID_MAX_Y; ++y)
 						for (let x = 0; x < GRID_MAX_X; ++x)
 							getGridElement(x, y).classList.remove('hint');
+					Store.update({ scoreBoard: scoreBoard.toJSON() });
 				}
 			}
 			else
@@ -436,7 +445,7 @@ import { Basket } from './modules/basket.js';
 			}
 
 		resetGame(restoreData);
-		if (gamePhase == GamePhase.GAMEOVER)
+		if (Store.get("gamePhase") == GamePhase.GAMEOVER)
 			gameOver.init();
 	});
 
@@ -470,18 +479,9 @@ import { Basket } from './modules/basket.js';
 	});
 
 	addEventListener('keydown', e => {
-		if (e.key == 'c' && gamePhase == GamePhase.MAIN) {
+		if (e.key == 'c' && Store.get("gamePhase") == GamePhase.MAIN) {
 			console.log('[chart] auto take.');
 			pickUp(search());
 		}
-	});
-
-	addEventListener('unload', () => {
-		localStorage.setItem('gamePhase', JSON.stringify(gamePhase));
-		localStorage.setItem('bonusScore', JSON.stringify(bonusScore));
-		localStorage.setItem('grid', JSON.stringify(grid));
-		localStorage.setItem('scoreBoard', JSON.stringify(scoreBoard));
-		localStorage.setItem('basket', JSON.stringify(basket));
-		localStorage.setItem('layout', JSON.stringify(layout));
 	});
 })();
