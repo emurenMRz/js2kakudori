@@ -26,8 +26,7 @@ export class GameClear {
 		child.style.width = '0px';
 		child.style.height = `${height}px`;
 		e.style.display = 'block';
-		this.beginTime = Date.now();
-		setTimeout(() => this.update(), 16);
+		requestAnimationFrame(this.update.bind(this));
 	}
 
 	clear() {
@@ -35,9 +34,12 @@ export class GameClear {
 		e.style.display = 'none';
 	}
 
-	update() {
+	update(elapsedTime) {
+		if (!this.beginTime)
+			this.beginTime = elapsedTime;
+
 		const e = document.getElementById('message');
-		const progressTime = Date.now() - this.beginTime;
+		const progressTime = elapsedTime - this.beginTime;
 		const child = e.childNodes[0];
 		const begin = progressTime;
 		if (begin >= 0) {
@@ -47,7 +49,7 @@ export class GameClear {
 			child.style.width = `${w}px`;
 		}
 		if (progressTime < 1900)
-			setTimeout(() => this.update(), 16);
+			requestAnimationFrame(this.update.bind(this));
 	}
 
 	resize(ratio) {
@@ -55,7 +57,7 @@ export class GameClear {
 		this.maxWidth = WIDTH * ratio;
 		this.maxHeight = HEIGHT * ratio;
 
-		const progressTime = Date.now() - this.beginTime;
+		const progressTime = performance.now() - this.beginTime;
 		const base = document.getElementById('base');
 		const cw = base.clientWidth;
 		const top = base.clientHeight / 2 - this.maxHeight / 2;

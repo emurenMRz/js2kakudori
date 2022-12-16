@@ -84,6 +84,6 @@ export class Basket {
 			lastBall.style.width = `${this.ballWidth}px`;
 			lastBall.style.height = `${this.ballHeight}px`;
 		}
-		setTimeout(() => this.addAnime(value - 1, lastBall), 50);
+		requestAnimationFrame(this.addAnime.bind(this, value - 1, lastBall));
 	}
 }

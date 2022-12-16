@@ -30,8 +30,7 @@ export class GameOver {
 			child.style.height = `${height}px`;
 		}
 		e.style.display = 'block';
-		this.beginTime = Date.now();
-		setTimeout(() => this.update(), 16);
+		requestAnimationFrame(this.update.bind(this));
 	}
 
 	clear() {
@@ -39,9 +38,12 @@ export class GameOver {
 		e.style.display = 'none';
 	}
 
-	update() {
+	update(elapsedTime) {
+		if (!this.beginTime)
+			this.beginTime = elapsedTime;
+
 		const e = document.getElementById('message');
-		const progressTime = Date.now() - this.beginTime;
+		const progressTime = elapsedTime - this.beginTime;
 		for (let i = 0; i < e.childNodes.length; ++i) {
 			const child = e.childNodes[i];
 			const begin = progressTime - i * 300;
@@ -53,7 +55,7 @@ export class GameOver {
 			}
 		}
 		if (progressTime < 1900)
-			setTimeout(() => this.update(), 16);
+			requestAnimationFrame(this.update.bind(this));
 	}
 
 	resize(ratio) {
@@ -61,7 +63,7 @@ export class GameOver {
 		this.maxWidth = WIDTH * ratio;
 		this.maxHeight = HEIGHT * ratio;
 
-		const progressTime = Date.now() - this.beginTime;
+		const progressTime = performance.now() - this.beginTime;
 		const base = document.getElementById('base');
 		const cw = base.clientWidth;
 		const top = base.clientHeight / 2 - this.maxHeight / 2;

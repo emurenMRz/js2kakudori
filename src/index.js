@@ -250,7 +250,7 @@ import Store from './modules/store.js';
 		s.style.top = `${((s.dataset.gy | 0) - 2) * TILE_H + cy - FLOAT_HEIGHT}px`;
 		d.style.top = `${((d.dataset.gy | 0) - 2) * TILE_H + cy - FLOAT_HEIGHT}px`;
 		connectLine.draw(line);
-		setTimeout(() => deleteTile(s, d, FLOAT_HEIGHT), 16);
+		requestAnimationFrame(deleteTile.bind(this, s, d, FLOAT_HEIGHT));
 	}
 
 	function resetGame(restoreData = undefined) {
@@ -306,7 +306,7 @@ import Store from './modules/store.js';
 			alpha(s);
 			alpha(d);
 			--c;
-			setTimeout(() => deleteTile(s, d, c), 16);
+			requestAnimationFrame(deleteTile.bind(this, s, d, c));
 			return;
 		}
 
@@ -415,7 +415,7 @@ import Store from './modules/store.js';
 					d.style.top = `${((d.dataset.gy | 0) - 2) * TILE_H + cy - FLOAT_HEIGHT}px`;
 					scoreBoard.add(1);
 					connectLine.draw(line);
-					setTimeout(() => deleteTile(s, d, FLOAT_HEIGHT), 16);
+					requestAnimationFrame(deleteTile.bind(this, s, d, FLOAT_HEIGHT));
 					for (let y = 0; y < GRID_MAX_Y; ++y)
 						for (let x = 0; x < GRID_MAX_X; ++x)
 							getGridElement(x, y).classList.remove('hint');
