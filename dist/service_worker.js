@@ -1,4 +1,4 @@
-var cacheName = 'js2kakudori-v1.20221216';
+var cacheName = 'js2kakudori-v1.20260207';
 var appFiles = [
 	'/',
 	'/index.html',
